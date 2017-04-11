@@ -69,7 +69,7 @@ cache_credentials = {{ domain['cache_credentials']|default(sssd_settings['defaul
 entry_cache_timeout = {{ domain['entry_cache_timeout']|default(sssd_settings['default_entry_cache_timeout'])|int }}
 ldap_purge_cache_timeout = 10800
 
-ldap_schema = {{ domain['ldap']['schema']|default(sssd_settings['default_ldap_schema'] }}
+ldap_schema = {{ domain['ldap']['schema']|default(sssd_settings['default_ldap_schema']) }}
 ldap_search_base = {{ domain['ldap']['search_base'] }}
 ldap_uri = {{ domain['ldap']['uris']|join(',') }}
 
@@ -77,6 +77,6 @@ ldap_tls_reqcert = demand
 ldap_id_use_start_tls = true
 {# TODO: Deprecate the use of anything less than TLS 1.2 for LDAP connections #}
 ldap_tls_cipher_suite = HIGH:!aNULL:!eNULL:!EXPORT:!SSLv2
-ldap_tls_cacert = {{ domain['ldap']['ldap_tls_cacert']|default(sssd_settings['default_ldap_tls_cacert'] }}
+ldap_tls_cacert = {{ domain['ldap']['ldap_tls_cacert']|default(sssd_settings['default_ldap_tls_cacert']) }}
 {% endif %}
 {%- endfor %}
