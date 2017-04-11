@@ -26,3 +26,19 @@ sssd:
       - pkg: sssd
     - watch:
       - file: sssd
+
+{# FIXME: Add support for multiple CA certs. Per-domain CA certs isn't
+   supported right now.
+#}
+{% if sssd_settings['cacert_contents'] is defined %}
+sssd_cacert:
+  file.managed:
+    - name: {{ sssd_settings['default_ldap_tls_cacert'] }}
+    - template: jinja
+    - source: salt://sssd/templates/cacert.pem.jinja
+    - user: root
+    - group: root
+    - mode: '0400'
+    - watch_in:
+      - service: sssd
+{% endif %}
