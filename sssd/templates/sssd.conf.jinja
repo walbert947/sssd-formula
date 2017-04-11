@@ -63,9 +63,9 @@ debug_level = {{ domain['debug_level']|default(sssd_settings['global_debug_level
 {%- if domain['id_provider']|upper == 'LDAP' %}
 
 lookup_family_order = ipv4_first
-enumerate = {{ domain['enumerate']|default(sssd_settings['default_enumerate'])|bool|lower }}
+enumerate = {{ domain['enumerate']|default(sssd_settings['default_enumerate'])|lower }}
 
-cache_credentials = {{ domain['cache_credentials']|default(sssd_settings['default_cache_credentials'])|bool|lower }}
+cache_credentials = {{ domain['cache_credentials']|default(sssd_settings['default_cache_credentials'])|lower }}
 entry_cache_timeout = {{ domain['entry_cache_timeout']|default(sssd_settings['default_entry_cache_timeout'])|int }}
 ldap_purge_cache_timeout = 10800
 
