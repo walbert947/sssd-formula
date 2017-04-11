@@ -15,6 +15,7 @@
 config_file_version = 2
 services = {{ sssd_settings['services']|join(',') }}
 
+domains = {{ sssd_settings['domains']|map(attribute='name')|join(',') }}
 
 ################################################################################
 # Services
