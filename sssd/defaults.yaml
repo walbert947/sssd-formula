@@ -1,0 +1,20 @@
+sssd:
+
+  global_debug_level: 3
+
+  nss:
+    filter_groups:
+      - root
+    filter_users:
+      - root
+  
+  pam:
+    offline_credentials_expiration: 7
+    offline_failed_login_attempts: 10
+    offline_failed_login_delay: 3
+  
+  default_enumerate: false
+  default_cache_credentials: false
+  default_entry_cache_timeout: 900
+  default_ldap_schema: rfc2307
+  default_ldap_tls_cacert: /etc/sssd/cacert.pem

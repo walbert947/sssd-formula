@@ -1,0 +1,26 @@
+{% import_yaml 'sssd/defaults.yaml' as default_settings %}
+
+{% set os_family_map = salt['grains.filter_by']({
+    'Debian': {
+        'packages': ['sssd', 'sssd-tools'],
+        'service': 'sssd',
+        'conf_file': '/etc/sssd/sssd.conf',
+    },
+    'RedHat': {
+        'packages': ['sssd', 'sssd-tools'],
+        'service': 'sssd',
+        'conf_file': '/etc/sssd/sssd.conf',
+    },
+  },
+  grain="os_family",
+  merge=salt['pillar.get']('sssd:lookup'))
+%}
+
+{% do default_settings.sssd.update(os_family_map) %}
+
+{% set sssd_settings = salt['pillar.get'](
+    'sssd',
+    default=default_settings.sssd,
+    merge=True
+  )
+%}

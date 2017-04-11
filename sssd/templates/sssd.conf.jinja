@@ -1,0 +1,82 @@
+{%- from "sssd/map.jinja" import sssd_settings with context -%}
+
+# NOTE: This file *MUST* have the following permissions, or sssd will refuse to
+# start:
+#     user:  root
+#     group: root
+#     mode:  0600
+
+
+################################################################################
+# SSSD Main Configuration
+################################################################################
+
+[sssd]
+config_file_version = 2
+services = {{ sssd_settings['services']|join(',') }}
+
+
+################################################################################
+# Services
+################################################################################
+
+{%- if 'nss' in sssd_settings['services'] %}
+
+[nss]
+debug_level = {{ sssd_settings['nss']['debug_level']|default(sssd_settings['global_debug_level'], true)|int }}
+entry_cache_nowait_percentage = 50
+
+filter_groups = {{ sssd_settings['nss']['filter_groups']|join(',') }}
+filter_users = {{ sssd_settings['nss']['filter_users']|join(',') }}
+{% endif %}
+
+{%- if 'pam' in sssd_settings['services'] %}
+
+[pam]
+debug_level = {{ sssd_settings['pam']['debug_level']|default(sssd_settings['global_debug_level'], true)|int }}
+
+offline_credentials_expiration = {{ sssd_settings['pam']['offline_credentials_expiration']|int }}
+offline_failed_login_attempts = {{ sssd_settings['pam']['offline_failed_login_attempts']|int }}
+offline_failed_login_delay = {{ sssd_settings['pam']['offline_failed_login_delay']|int }}
+{% endif %}
+
+{%- if 'sudo' in sssd_settings['services'] %}
+
+debug_level = {{ sssd_settings['sudo']['debug_level']|default(sssd_settings['global_debug_level'], true)|int }}
+{% endif %}
+
+{%- if 'autofs' in sssd_settings['services'] %}
+
+debug_level = {{ sssd_settings['autofs']['debug_level']|default(sssd_settings['global_debug_level'], true)|int }}
+{% endif %}
+
+
+################################################################################
+# Domains
+################################################################################
+{% for domain in sssd_settings['domains'] %}
+
+[domain/{{ domain['name'] }}]
+id_provider = {{ domain['id_provider'] }}
+debug_level = {{ domain['debug_level']|default(sssd_settings['global_debug_level'], true)|int }}
+
+{%- if domain['id_provider']|upper == 'LDAP' %}
+
+lookup_family_order = ipv4_first
+enumerate = {{ domain['enumerate']|default(sssd_settings['default_enumerate'])|bool|lower }}
+
+cache_credentials = {{ domain['cache_credentials']|default(sssd_settings['default_cache_credentials'])|bool|lower }}
+entry_cache_timeout = {{ domain['entry_cache_timeout']|default(sssd_settings['default_entry_cache_timeout'])|int }}
+ldap_purge_cache_timeout = 10800
+
+ldap_schema = {{ domain['ldap']['schema']|default(sssd_settings['default_ldap_schema'] }}
+ldap_search_base = {{ domain['ldap']['search_base'] }}
+ldap_uri = {{ domain['ldap']['uris']|join(',') }}
+
+ldap_tls_reqcert = demand
+ldap_id_use_start_tls = true
+{# TODO: Deprecate the use of anything less than TLS 1.2 for LDAP connections #}
+ldap_tls_cipher_suite = HIGH:!aNULL:!eNULL:!EXPORT:!SSLv2
+ldap_tls_cacert = {{ domain['ldap']['ldap_tls_cacert']|default(sssd_settings['default_ldap_tls_cacert'] }}
+{% endif %}
+{%- endfor %}
